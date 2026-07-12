@@ -58,7 +58,7 @@ const Signup = () => {
           Create Account
         </h2>
         <p className="text-slate-500 text-sm mt-1 text-center">
-          Register as an Employee to get started
+          Sign up to get access. Your admin will assign your department and role.
         </p>
       </div>
 

@@ -9,10 +9,25 @@ const logActivity = require('../utils/activityLogger');
 const { ROLES } = require('../config/constants');
 
 const signup = asyncHandler(async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { name, email, password } = req.body;
   const existing = await User.findOne({ email });
   if (existing) throw new ApiError(409, 'Email already registered');
   const user = await User.create({ name, email, password, role: ROLES.EMPLOYEE });
+
+  // Auto-create a skeleton Employee record so the user immediately appears
+  // in the admin's Employee Directory. The admin can then assign their department,
+  // designation, and promote their role as needed.
+  const Employee = require('../models/Employee.model');
+  const employeeId = `EMP-${Date.now().toString().slice(-6)}`;
+  await Employee.create({
+    employeeId,
+    user: user._id,
+    department: null,
+    designation: 'Unassigned',
+    role: ROLES.EMPLOYEE,
+    status: 'active',
+  });
+
   const accessToken = generateAccessToken(user._id);
   const refreshToken = generateRefreshToken(user._id);
   user.refreshToken = refreshToken;

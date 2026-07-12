@@ -5,8 +5,8 @@ const employeeSchema = new mongoose.Schema(
   {
     employeeId: { type: String, required: true, unique: true, trim: true },
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department', required: true },
-    designation: { type: String, required: true, trim: true },
+    department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department', default: null },
+    designation: { type: String, default: 'Unassigned', trim: true },
     role: { type: String, enum: Object.values(ROLES), default: ROLES.EMPLOYEE },
     status: { type: String, enum: Object.values(EMPLOYEE_STATUS), default: EMPLOYEE_STATUS.ACTIVE },
     joinedAt: { type: Date, default: Date.now },
