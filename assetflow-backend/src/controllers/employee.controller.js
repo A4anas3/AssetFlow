@@ -32,21 +32,31 @@ const getEmployeeById = asyncHandler(async (req, res) => {
 });
 
 const createEmployee = asyncHandler(async (req, res) => {
-  const emp = await Employee.create(req.body);
+  const emp = await Employee.create({
+    ...req.body,
+    role: ROLES.EMPLOYEE,
+  });
+
   await logActivity({
     actor: req.user._id,
     action: 'Created employee record',
     module: 'employee',
     targetId: emp._id,
   });
+
   res.status(201).json(new ApiResponse(201, emp, 'Employee created'));
 });
 
 const updateEmployee = asyncHandler(async (req, res) => {
-  const emp = await Employee.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
+  const { role, ...updateData } = req.body;
+  const emp = await Employee.findByIdAndUpdate(
+    req.params.id,
+    updateData,
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
   if (!emp) throw new ApiError(404, 'Employee not found');
   await logActivity({
     actor: req.user._id,
