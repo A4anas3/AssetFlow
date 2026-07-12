@@ -8,9 +8,20 @@ const bookingSchema = new mongoose.Schema(
     startTime: { type: Date, required: true },
     endTime: { type: Date, required: true },
     purpose: { type: String, default: '' },
-    status: { type: String, enum: Object.values(BOOKING_STATUS), default: BOOKING_STATUS.CONFIRMED },
+
+    // Spec: Upcoming, Ongoing, Completed, Cancelled
+    status: {
+      type: String,
+      enum: Object.values(BOOKING_STATUS),
+      default: BOOKING_STATUS.UPCOMING,
+    },
+
     cancelledAt: { type: Date },
     cancelReason: { type: String, default: '' },
+    rescheduledAt: { type: Date },
+
+    // For future reminder job — track if pre-slot reminder was sent
+    reminderSent: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

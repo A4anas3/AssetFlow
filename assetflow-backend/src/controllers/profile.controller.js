@@ -26,7 +26,7 @@ const changePassword = asyncHandler(async (req, res) => {
 
 const updateAvatar = asyncHandler(async (req, res) => {
   if (!req.file) throw new ApiError(400, 'No file uploaded');
-  const avatarPath = `/uploads/${req.file.filename}`;
+  const avatarPath = `/uploads/avatars/${req.file.filename}`;
   const user = await User.findByIdAndUpdate(req.user._id, { avatar: avatarPath }, { new: true }).select('-password -refreshToken');
   res.json(new ApiResponse(200, user, 'Avatar updated'));
 });

@@ -1,6 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { getAudits, getAuditById, createAudit, assignAuditor, verifyAsset, closeAudit, getAuditReport } = require('../controllers/audit.controller');
+const {
+  getAudits,
+  getAuditById,
+  createAudit,
+  assignAuditors,
+  verifyAsset,
+  closeAudit,
+  getAuditReport,
+} = require('../controllers/audit.controller');
 const { protect, authorize } = require('../middleware/auth.middleware');
 const validate = require('../middleware/validate.middleware');
 const { auditValidator } = require('../validators/audit.validator');
@@ -11,7 +19,9 @@ router.get('/', getAudits);
 router.get('/:id', getAuditById);
 router.get('/:id/report', getAuditReport);
 router.post('/', authorize(ROLES.ADMIN, ROLES.ASSET_MANAGER), validate(auditValidator), createAudit);
-router.patch('/:id/assign-auditor', authorize(ROLES.ADMIN), assignAuditor);
+// Updated: assignAuditors (array) — was assignAuditor (single)
+router.patch('/:id/assign-auditors', authorize(ROLES.ADMIN), assignAuditors);
+// Authorization now enforced inside verifyAsset controller (auditor-only)
 router.patch('/:id/verify-asset', verifyAsset);
 router.patch('/:id/close', authorize(ROLES.ADMIN, ROLES.ASSET_MANAGER), closeAudit);
 

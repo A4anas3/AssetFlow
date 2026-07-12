@@ -7,7 +7,16 @@ const departmentSchema = new mongoose.Schema(
     code: { type: String, required: true, unique: true, uppercase: true, trim: true },
     description: { type: String, default: '' },
     head: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
-    status: { type: String, enum: Object.values(DEPARTMENT_STATUS), default: DEPARTMENT_STATUS.ACTIVE },
+
+    // Optional parent for department hierarchy (spec: "optional Parent Department")
+    parentDepartment: { type: mongoose.Schema.Types.ObjectId, ref: 'Department', default: null },
+
+    location: { type: String, default: '' },
+    status: {
+      type: String,
+      enum: Object.values(DEPARTMENT_STATUS),
+      default: DEPARTMENT_STATUS.ACTIVE,
+    },
   },
   { timestamps: true }
 );

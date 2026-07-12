@@ -5,12 +5,15 @@ const ROLES = {
   EMPLOYEE: 'employee',
 };
 
+// Full lifecycle per spec: Available → Allocated / Reserved → In Maintenance → Retired / Lost / Disposed
 const ASSET_STATUS = {
   AVAILABLE: 'available',
   ALLOCATED: 'allocated',
+  RESERVED: 'reserved',
   IN_MAINTENANCE: 'in_maintenance',
   RETIRED: 'retired',
   LOST: 'lost',
+  DISPOSED: 'disposed',
 };
 
 const ALLOCATION_STATUS = {
@@ -18,6 +21,7 @@ const ALLOCATION_STATUS = {
   RETURN_REQUESTED: 'return_requested',
   RETURNED: 'returned',
   CANCELLED: 'cancelled',
+  TRANSFERRED: 'transferred',
 };
 
 const TRANSFER_STATUS = {
@@ -27,8 +31,10 @@ const TRANSFER_STATUS = {
   CANCELLED: 'cancelled',
 };
 
+// Spec: Upcoming, Ongoing, Completed, Cancelled
 const BOOKING_STATUS = {
-  CONFIRMED: 'confirmed',
+  UPCOMING: 'upcoming',
+  ONGOING: 'ongoing',
   CANCELLED: 'cancelled',
   COMPLETED: 'completed',
 };
