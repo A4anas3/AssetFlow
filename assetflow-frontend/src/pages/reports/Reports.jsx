@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axios';
 
 // ─── Pure SVG Bar Chart (no external library) ───────────────────────────────
@@ -126,6 +128,9 @@ const HorizBarChart = ({ data, valueKey, labelKey, color = '#f43f5e', label }) =
 
 // ─── Main Reports Page ────────────────────────────────────────────────────────
 const Reports = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
   const [activeTab, setActiveTab] = useState('utilization');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -141,8 +146,14 @@ const Reports = () => {
   const [exportLoading, setExportLoading] = useState(false);
 
   useEffect(() => {
-    fetchAllReports();
-  }, []);
+    if (user) {
+      if (!['admin', 'asset_manager'].includes(user.role)) {
+        navigate('/dashboard', { replace: true });
+      } else {
+        fetchAllReports();
+      }
+    }
+  }, [user, navigate]);
 
   const fetchAllReports = async () => {
     setLoading(true);
