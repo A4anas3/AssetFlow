@@ -72,13 +72,18 @@ const updateBooking = asyncHandler(async (req, res) => {
   // Only the owner or admin can update
   const isOwner = booking.bookedBy.toString() === req.user._id.toString();
   const isAdmin = req.user.role === 'admin';
-  if (!isOwner && !isAdmin) throw new ApiError(403, 'Not authorized to update this booking');
+  if (!isOwner && !isAdmin)
+    throw new ApiError(403, 'Not authorized to update this booking');
 
-  const updated = await Booking.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-  res.json(new ApiResponse(200, updated, 'Booking updated'));
+  const { purpose } = req.body;
+
+  if (purpose !== undefined) {
+    booking.purpose = purpose;
+  }
+
+  await booking.save();
+
+  res.json(new ApiResponse(200, booking, 'Booking updated'));
 });
 
 const deleteBooking = asyncHandler(async (req, res) => {
