@@ -39,13 +39,24 @@ const getTransferById = asyncHandler(async (req, res) => {
 });
 
 const createTransfer = asyncHandler(async (req, res) => {
-  const transfer = await Transfer.create({ ...req.body, requestedBy: req.user._id });
+  const { asset, fromDepartment, toDepartment, toEmployee, reason } = req.body;
+
+  const transfer = await Transfer.create({
+    asset,
+    fromDepartment,
+    toDepartment,
+    toEmployee,
+    reason,
+    requestedBy: req.user._id,
+  });
+
   await logActivity({
     actor: req.user._id,
     action: 'Created transfer request',
     module: 'transfer',
     targetId: transfer._id,
   });
+
   res.status(201).json(new ApiResponse(201, transfer, 'Transfer request created'));
 });
 
