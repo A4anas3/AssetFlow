@@ -5,7 +5,7 @@ const { ApiResponse, ApiError } = require('../utils/ApiResponse');
 const asyncHandler = require('../utils/asyncHandler');
 const paginate = require('../utils/paginate');
 const logActivity = require('../utils/activityLogger');
-const { ROLES } = require('../config/constants');
+const { ROLES,ALLOCATION_STATUS,EMPLOYEE_STATUS, } = require('../config/constants');
 
 const getEmployees = asyncHandler(async (req, res) => {
   const query = {};
@@ -73,7 +73,10 @@ const deleteEmployee = asyncHandler(async (req, res) => {
 
   // Check for active allocations before deleting
   const Allocation = require('../models/Allocation.model');
-  const activeAlloc = await Allocation.findOne({ employee: emp._id, status: 'active' });
+  const activeAlloc = await Allocation.findOne({
+    employee: emp._id,
+    status: ALLOCATION_STATUS.ACTIVE,
+  });
   if (activeAlloc)
     throw new ApiError(400, 'Cannot delete employee with active asset allocations');
 
@@ -98,7 +101,10 @@ const promoteEmployee = asyncHandler(async (req, res) => {
   const emp = await Employee.findByIdAndUpdate(
     req.params.id,
     { designation, role },
-    { new: true }
+    {
+      new: true,
+      runValidators: true,
+    }
   ).populate('user department');
   if (!emp) throw new ApiError(404, 'Employee not found');
 
@@ -131,12 +137,15 @@ const updateEmployeeStatus = asyncHandler(async (req, res) => {
   const emp = await Employee.findByIdAndUpdate(
     req.params.id,
     { status: req.body.status },
-    { new: true }
+    {
+      new: true,
+      runValidators: true,
+    }
   );
   if (!emp) throw new ApiError(404, 'Employee not found');
   // Sync isActive on User as well
   await User.findByIdAndUpdate(emp.user, {
-    isActive: req.body.status === 'active',
+    isActive: req.body.status === EMPLOYEE_STATUS.ACTIVE,
   });
   res.json(new ApiResponse(200, emp, 'Status updated'));
 });
@@ -145,7 +154,10 @@ const updateEmployeeDepartment = asyncHandler(async (req, res) => {
   const emp = await Employee.findByIdAndUpdate(
     req.params.id,
     { department: req.body.department },
-    { new: true }
+    {
+      new: true,
+      runValidators: true,
+    }
   );
   if (!emp) throw new ApiError(404, 'Employee not found');
   await logActivity({
@@ -164,7 +176,10 @@ const updateEmployeeRole = asyncHandler(async (req, res) => {
   const emp = await Employee.findByIdAndUpdate(
     req.params.id,
     { role: req.body.role },
-    { new: true }
+    {
+      new: true,
+      runValidators: true,
+    }
   ).populate('user');
   if (!emp) throw new ApiError(404, 'Employee not found');
 
