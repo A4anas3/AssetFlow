@@ -1,4 +1,5 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import api from '../api/axios';
 
 const AuthContext = createContext(null);
 
@@ -8,6 +9,22 @@ export const AuthProvider = ({ children }) => {
     return stored ? JSON.parse(stored) : null;
   });
   const [token, setToken] = useState(() => localStorage.getItem('accessToken') || null);
+
+  // Re-verify the user on mount and when token changes
+  useEffect(() => {
+    const verifyUser = async () => {
+      if (token) {
+        try {
+          const res = await api.get('/auth/me');
+          setUser(res.data.data);
+          localStorage.setItem('user', JSON.stringify(res.data.data));
+        } catch (error) {
+          console.error("Failed to verify user session", error);
+        }
+      }
+    };
+    verifyUser();
+  }, [token]);
 
   const login = (userData, accessToken, refreshToken) => {
     setUser(userData);
