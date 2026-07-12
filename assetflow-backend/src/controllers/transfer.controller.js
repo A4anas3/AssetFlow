@@ -44,7 +44,7 @@ const rejectTransfer = asyncHandler(async (req, res) => {
   if (!transfer) throw new ApiError(404, 'Transfer not found');
   if (transfer.status !== TRANSFER_STATUS.PENDING) throw new ApiError(400, 'Transfer is not pending');
   transfer.status = TRANSFER_STATUS.REJECTED;
-  transfer.approvedBy = req.user._id;
+  transfer.rejectedBy = req.user._id;
   transfer.rejectionReason = req.body.rejectionReason || '';
   await transfer.save();
   res.json(new ApiResponse(200, transfer, 'Transfer rejected'));
@@ -54,6 +54,10 @@ const cancelTransfer = asyncHandler(async (req, res) => {
   const transfer = await Transfer.findById(req.params.id);
   if (!transfer) throw new ApiError(404, 'Transfer not found');
   if (transfer.status !== TRANSFER_STATUS.PENDING) throw new ApiError(400, 'Only pending transfers can be cancelled');
+  // Only the original requester or an admin/asset-manager can cancel
+  const isRequester = transfer.requestedBy.toString() === req.user._id.toString();
+  const isPrivileged = [ROLES.ADMIN, ROLES.ASSET_MANAGER].includes(req.user.role);
+  if (!isRequester && !isPrivileged) throw new ApiError(403, 'Not authorized to cancel this transfer');
   transfer.status = TRANSFER_STATUS.CANCELLED;
   await transfer.save();
   res.json(new ApiResponse(200, transfer, 'Transfer cancelled'));

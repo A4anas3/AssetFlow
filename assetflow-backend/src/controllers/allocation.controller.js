@@ -31,9 +31,13 @@ const createAllocation = asyncHandler(async (req, res) => {
 });
 
 const requestReturn = asyncHandler(async (req, res) => {
-  const allocation = await Allocation.findById(req.params.id);
+  const allocation = await Allocation.findById(req.params.id).populate('employee');
   if (!allocation) throw new ApiError(404, 'Allocation not found');
   if (allocation.status !== ALLOCATION_STATUS.ACTIVE) throw new ApiError(400, 'Allocation is not active');
+  // Only the assigned employee or an admin/asset-manager can request a return
+  const isAssignedEmployee = allocation.employee?._id?.toString() === req.user._id.toString();
+  const isPrivileged = [ROLES.ADMIN, ROLES.ASSET_MANAGER].includes(req.user.role);
+  if (!isAssignedEmployee && !isPrivileged) throw new ApiError(403, 'Not authorized to request return for this allocation');
   allocation.status = ALLOCATION_STATUS.RETURN_REQUESTED;
   await allocation.save();
   await Notification.create({ recipient: allocation.allocatedBy, type: 'return', title: 'Return Requested', message: 'An employee has requested asset return', linkedModule: 'allocation', linkedId: allocation._id });
@@ -43,6 +47,7 @@ const requestReturn = asyncHandler(async (req, res) => {
 const approveReturn = asyncHandler(async (req, res) => {
   const allocation = await Allocation.findById(req.params.id);
   if (!allocation) throw new ApiError(404, 'Allocation not found');
+  if (allocation.status !== ALLOCATION_STATUS.RETURN_REQUESTED) throw new ApiError(400, 'Return has not been requested for this allocation');
   allocation.status = ALLOCATION_STATUS.RETURNED;
   allocation.returnedAt = new Date();
   allocation.returnApprovedBy = req.user._id;

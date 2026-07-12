@@ -71,7 +71,12 @@ const getMe = asyncHandler(async (req, res) => {
 const refreshToken = asyncHandler(async (req, res) => {
   const { refreshToken: token } = req.body;
   if (!token) throw new ApiError(401, 'Refresh token required');
-  const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+  } catch (err) {
+    throw new ApiError(401, 'Invalid or expired refresh token');
+  }
   const user = await User.findById(decoded.id);
   if (!user || user.refreshToken !== token) throw new ApiError(401, 'Invalid refresh token');
   const accessToken = generateAccessToken(user._id);
