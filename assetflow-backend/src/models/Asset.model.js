@@ -21,7 +21,7 @@ const assetSchema = new mongoose.Schema(
     // Physical state — used in audit verification and return condition check-in
     condition: {
       type: String,
-      enum: ['new', 'good', 'fair', 'poor'],
+      enum: ['new', 'good', 'fair', 'poor', 'damaged'],
       default: 'good',
     },
 
