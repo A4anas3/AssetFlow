@@ -52,7 +52,7 @@ const getMaintenanceFrequency = asyncHandler(async (req, res) => {
         as: 'asset',
       },
     },
-    { $unwind: { path: '$asset', preserveNullAndEmpty: true } },
+    { $unwind: { path: '$asset', preserveNullAndEmptyArrays: true } },
     {
       $project: {
         count: 1,
@@ -90,7 +90,7 @@ const getMaintenanceFrequency = asyncHandler(async (req, res) => {
         as: 'category',
       },
     },
-    { $unwind: { path: '$category', preserveNullAndEmpty: true } },
+    { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
     { $project: { count: 1, totalCost: 1, 'category.name': 1 } },
   ]);
 
@@ -123,7 +123,7 @@ const getDepartmentSummary = asyncHandler(async (req, res) => {
         as: 'department',
       },
     },
-    { $unwind: { path: '$department', preserveNullAndEmpty: true } },
+    { $unwind: { path: '$department', preserveNullAndEmptyArrays: true } },
     {
       $project: {
         total: 1,
