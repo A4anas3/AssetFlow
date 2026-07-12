@@ -23,6 +23,7 @@ import CategoryEdit from './pages/organization/categories/CategoryEdit';
 import EmployeeList from './pages/organization/employees/EmployeeList';
 import EmployeeDetail from './pages/organization/employees/EmployeeDetail';
 import EmployeeEdit from './pages/organization/employees/EmployeeEdit';
+import EmployeeCreate from './pages/organization/employees/EmployeeCreate';
 
 import AssetList from './pages/assets/AssetList';
 import AssetCreate from './pages/assets/AssetCreate';
@@ -103,6 +104,7 @@ const App = () => {
                 <Route path="/organization/categories/:id/edit" element={<CategoryEdit />} />
 
                 <Route path="/organization/employees" element={<EmployeeList />} />
+                <Route path="/organization/employees/create" element={<EmployeeCreate />} />
                 <Route path="/organization/employees/:id" element={<EmployeeDetail />} />
                 <Route path="/organization/employees/:id/edit" element={<EmployeeEdit />} />
               </Route>
